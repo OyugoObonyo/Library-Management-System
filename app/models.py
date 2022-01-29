@@ -1,7 +1,7 @@
 """
 A module with classes serving as database tables
 """
-from app import db
+from app import db, login
 from flask_login import UserMixin
 from werkzeug.security import generate_password_hash, check_password_hash
 
@@ -34,3 +34,12 @@ class User(UserMixin, db.Model):
         Returns a string representation of a user object
         """
         return f"<User_id: {self.id}, User_name: {self.name}>"
+
+
+@login.user_loader
+def load_user(id):
+    """
+    A user loader function that aids flask in geting user id for login
+    returns the user id
+    """
+    return User.query.get(int(id))
