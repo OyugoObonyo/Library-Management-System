@@ -99,3 +99,4 @@ ENV/
 .mypy_cache/
 /TODO
 /LMS
+.vscode/settings.json
