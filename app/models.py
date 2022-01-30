@@ -59,7 +59,7 @@ class Book(db.Model):
     A class that represents book table in the database
     """
     id = db.Column(db.Integer, index=True, primary_key=True)
-    synopsis = db.Column(db.String(500), nullable=False)
+    synopsis = db.Column(db.String(1000), nullable=False)
     title = db.Column(db.String(120), nullable=False)
     author = db.Column(db.String(50))
     year_of_publish = db.Column(db.Integer)
