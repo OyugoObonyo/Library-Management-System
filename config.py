@@ -11,7 +11,7 @@ class Config(object):
     """
     Assign the configuration variables as class variables of the config object
     """
-    SECRET_KEY = os.environ.get('SECRET_KEY')
+    SECRET_KEY = os.environ.get('SECRET_KEY') or 'secret-key-for-development'
     # Add sqlite as development db
     SQLALCHEMY_DATABASE_URI = 'sqlite:///' + os.path.join(root_dir, 'app.db')
     SQLALCHEMY_TRACK_MODIFICATIONS = False
