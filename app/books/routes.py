@@ -43,7 +43,7 @@ def save_image(image_file):
     return file_name
 
 
-@bp.route('/add_book/<id>', methods=['GET', 'POST'])
+@bp.route('/add-book/<id>', methods=['GET', 'POST'])
 def add_book(id):
     """
     A route that adds a book to the database
@@ -92,7 +92,7 @@ def delete_image(image_file):
     os.remove(file_path)
 
 
-@bp.route('/delete_book/<id>', methods=['GET', 'DELETE'])
+@bp.route('/delete-book/<id>', methods=['GET', 'DELETE'])
 def delete_book(id):
     """
     A route that handles deleting a book from the database
