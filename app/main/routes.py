@@ -4,7 +4,7 @@ A module that handles the routes of the main part of the app
 from flask import render_template
 from flask_login import login_required
 from app.main import bp
-from app.models import Book, User, us
+from app.models import Book, User
 
 
 @bp.route('/')
