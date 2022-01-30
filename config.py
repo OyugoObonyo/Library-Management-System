@@ -16,5 +16,7 @@ class Config(object):
     SQLALCHEMY_DATABASE_URI = 'sqlite:///' + os.path.join(root_dir, 'app.db')
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     BOOK_IMAGES_DIR = 'static/images/books'
+    # Limit maximum length of book cover image to 5MB
+    MAX_CONTENT_LENGTH = 5 * 1024 * 1024
 
 # os.environ.get('DATABASE_URL').replace("postgres://", "postgresql://", 1)
