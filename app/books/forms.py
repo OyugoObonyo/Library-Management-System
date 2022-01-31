@@ -16,7 +16,7 @@ class AddBookForm(FlaskForm):
     author = StringField('Author', validators=[DataRequired()])
     year_of_publish = IntegerField('Year of publishment', validators=[DataRequired()])
     category = StringField('Category', validators=[DataRequired()])
-    image = FileField('Image', validators=[DataRequired(), FileAllowed('jpg', 'jpeg', 'png')])
+    image = FileField('Image', validators=[DataRequired(), FileAllowed(['jpg', 'jpeg', 'png'])])
     submit = SubmitField('Add book')
 
 
