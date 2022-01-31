@@ -23,7 +23,7 @@ def login():
         user = User.query.filter(name=form.username.data)
         # Validate if user doesn't exist or pasword is wrong
         if user is None or not user.check_password(form.password.data):
-            flash('Invalid username or password')
+            flash('Invalid username or password', 'danger')
             return redirect(url_for('auth.login'))
         login_user(user, remember=form.remember_me.data)
         # Parse the url to find out the page user is to be referred to
@@ -50,7 +50,7 @@ def register():
         user.set_password(form.password.data)
         db.session.add(user)
         db.session.commit()
-        flash('Congratulations! Registration was successful')
+        flash('Congratulations! Registration was successful', 'success')
         return redirect(url_for('auth.login'))
     return render_template('auth/register.html', title="Register", form=form)
 
