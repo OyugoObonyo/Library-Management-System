@@ -35,7 +35,6 @@ class UserModelCase(unittest.TestCase):
         self.assertTrue(u.check_password('StringPassword'))
         self.assertFalse(u.check_password('NotStringPassword'))
 
-# Integration Test
 
 # System Tests
 class AppTestCase(unittest.TestCase):
@@ -48,25 +47,25 @@ class AppTestCase(unittest.TestCase):
 
             self.assertEqual(response.status_code, 302)
 
-    def test_booksearch(self):
+    def test_book_search(self):
         with app.test_client() as c:
             response = c.get('/books/s/<name>')
 
             self.assertEqual(response.status_code, 200)
 
-    def test_addbook(self):
+    def test_add_book(self):
         with app.test_client() as c:
             response = c.get('/add-book/<id>')
 
             self.assertEqual(response.status_code, 302)
 
-    def test_updatebook(self):
+    def test_update_book(self):
         with app.test_client() as c:
             response = c.get('/update/<id>')
 
             self.assertEqual(response.status_code, 302)
 
-    def test_deletebook(self):
+    def test_delete_book(self):
         with app.test_client() as c:
             response = c.get('/delete-book/<id>')
 
@@ -89,4 +88,11 @@ class AppTestCase(unittest.TestCase):
             response = c.get('/register')
 
             self.assertEqual(response.status_code, 302)
+
+
 # API tests
+
+
+if __name__ == "__main__":
+    unittest.main()
+    
