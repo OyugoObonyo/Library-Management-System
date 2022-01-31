@@ -1,0 +1,21 @@
+/** global selectors **/
+body{
+    font-family: 'Poppins', sans-serif;
+}
+
+/** index page selectors **/
+#mysearch{
+    margin-top: 30px;
+    margin-bottom: 30px;
+}
+#col1{
+    background-color: blueviolet;
+    height: 200;
+}
+
+/** login page selectors **/
+#loginpage{
+    margin-top: 50px;
+    display: flex;
+    justify-content: center;
+}
