@@ -62,4 +62,4 @@ def logout():
     Route that handles logging users out
     """
     logout_user()
-    return render_template('auth/login.html', title='Log In')
+    return redirect(url_for('auth.login'))
