@@ -21,7 +21,7 @@ class RegistrationForm(FlaskForm):
         """
         Validates form to check whether username already exists in the db
         """
-        user = User.query.filter_by(username=username.data).first()
+        user = User.query.filter_by(name=username.data).first()
         if user is not None:
             raise ValidationError("Sorry, this Username is taken")
 
