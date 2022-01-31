@@ -10,7 +10,7 @@ from werkzeug.urls import url_parse
 from app import db
 
 
-@bp.route('/login')
+@bp.route('/login', methods=['GET', 'POST'])
 def login():
     """
     Route that handles logging users in
@@ -20,12 +20,12 @@ def login():
         return redirect(url_for('main.index'))
     form = LoginForm()
     if form.validate_on_submit():
-        user = User.query.filter(name=form.username.data)
+        user = User.query.filter_by(name=form.username.data).first()
         # Validate if user doesn't exist or pasword is wrong
         if user is None or not user.check_password(form.password.data):
             flash('Invalid username or password', 'danger')
             return redirect(url_for('auth.login'))
-        login_user(user, remember=form.remember_me.data)
+        login_user(user)
         # Parse the url to find out the page user is to be referred to
         next_page = request.args.get('next')
         # Check if next page is empty or if network location is not empty
