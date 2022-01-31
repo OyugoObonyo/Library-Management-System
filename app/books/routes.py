@@ -69,7 +69,7 @@ def add_book(id):
 
 
 @bp.route('/update/<id>', methods=['GET', 'PUT'])
-def add_book(id):
+def update_book(id):
     """
     A route that updates the properties of a particular book in the database
     """
@@ -104,3 +104,21 @@ def delete_book(id):
     db.session.delete(book)
     db.session.commit()
     return redirect(request.referrer)
+
+
+@bp.route('/borrow/<id>', methods=['GET', 'POST'])
+def borrow_book(id):
+    """
+    A route that handles borrowing the book
+    borrower's id and book's id is added to the user_book association table
+    """
+    pass
+
+
+@bp.route('/return/<id>', methods=['GET', 'POST'])
+def return_book(id):
+    """
+    A user can return a book they're done reading
+    The route clears the book and user id from the association table
+    """
+    pass
