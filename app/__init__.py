@@ -15,6 +15,8 @@ migrate = Migrate(db, render_as_batch=True)
 login = LoginManager()
 login.login_view = 'auth.login'
 login.login_message = 'Please log in to access this page'
+# Categorize the login required message
+login.login_message_category = 'info'
 
 
 def create_app(config_class=Config):
