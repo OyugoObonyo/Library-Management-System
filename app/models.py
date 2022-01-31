@@ -63,7 +63,6 @@ class Book(db.Model):
     title = db.Column(db.String(120), nullable=False)
     author = db.Column(db.String(50))
     year_of_publish = db.Column(db.Integer)
-    category = db.Column(db.String(50))
     img_url = db.Column(db.String(40))
 
     def __repr__(self):
