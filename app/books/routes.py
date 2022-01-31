@@ -62,6 +62,7 @@ def add_book(id):
                         img_url=image_url)
             db.session.add(book)
             db.session.commit()
+            flash(f"{book.title} has been succesfully added to the library", "success")
             return redirect(url_for('main.index'))
     except RequestEntityTooLarge:
         raise "Maximum upload size allowed is 5MB"
@@ -80,6 +81,7 @@ def update_book(id):
         book.synopsis = form.synopsis.data
         book.category = form.category.data
         db.session.commit()
+        flash(f"{book.title} has been succesfully updated", "success")
         return redirect(request.referrer)
     return render_template('books/update_book.html', title='Update details', form=form)
 
