@@ -28,7 +28,7 @@ def create_app(config_class=Config):
 
     # initialize objects derived from the extensions
     db.init_app(app)
-    migrate.init_app(app)
+    migrate.init_app(app, db)
     login.init_app(app)
 
     # register blueprints to the application
