@@ -2,11 +2,13 @@
 This module handles the creation of the application's instance
 Various extensions are initialized and configuration settings are also attached
 """
+import imp
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager
 from config import Config
 from flask_migrate import Migrate
+from flask_principal import Principal, Permission, RoleNeed
 
 
 # Create instances from the installed extensions
@@ -17,6 +19,9 @@ login.login_view = 'auth.login'
 login.login_message = 'Please log in to access this page'
 # Categorize the login required message
 login.login_message_category = 'info'
+principal = Principal()
+# This could perhaps be a little more sophisticated, but it'll do.
+admin_permission = Permission(RoleNeed("informs_admin"))
 
 
 def create_app(config_class=Config):
@@ -32,6 +37,7 @@ def create_app(config_class=Config):
     db.init_app(app)
     migrate.init_app(app, db)
     login.init_app(app)
+    principal.init_app(app)
 
     # register blueprints to the application
     from app.auth import bp as auth_bp
