@@ -65,11 +65,11 @@ def add_book():
     """
     check_admin()
     form = AddBookForm()
-    image = form.image.data
-    image_url = save_image(image)
     # Catch the case where image is larger than 5MB
     try:
         if form.validate_on_submit():
+            image = form.image.data
+            image_url = save_image(image)
             book = Book(name=form.title.data,
                         synopsis=form.synopsis.data,
                         author=form.author.data,
