@@ -24,12 +24,24 @@
               </button>
               <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ms-auto">
-                  <li class="nav-item">
-                    <a class="nav-link active" aria-current="page" href="">My books</a>
-                  </li>
-                  <li class="nav-item">
-                    <a class="nav-link active" href="{{ url_for('auth.logout') }}">Log out</a>
-                  </li>
+                  {% if current_user.is_admin %}
+                    <li class="nav-item">
+                      <a class="nav-link active" href="{{ url_for('admin.add-book') }}">Add a book</a>
+                    </li>
+                    <li class="nav-item">
+                      <a class="nav-link active" aria-current="page" href="{{ url_for('admin.users') }}">Users</a>
+                    </li>
+                    <li class="nav-item">
+                      <a class="nav-link active" href="{{ url_for('auth.logout') }}">Log out</a>
+                    </li>
+                  {% else %}
+                    <li class="nav-item">
+                      <a class="nav-link active" aria-current="page" href="">My books</a>
+                    </li>
+                    <li class="nav-item">
+                      <a class="nav-link active" href="{{ url_for('auth.logout') }}">Log out</a>
+                    </li>
+                  {% endif %}
                 </ul>
               </div>
               {% endif %}
