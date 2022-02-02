@@ -17,8 +17,8 @@ def check_admin():
     """
     A function that checks if a user is an administrator
     """
-    if not current_user.is_admin:
-        abort(403)
+    if current_user.is_anonymous or not current_user.is_admin:
+        abort(404)
 
 
 @bp.route('/admin')
@@ -38,7 +38,7 @@ def users():
     """
     check_admin()
     users = User.query.all()
-    return render_template('auth/users', title="Users", users=users)
+    return render_template('admin/users.html', title="Users", users=users)
 
 
 def save_image(image_file):
@@ -59,7 +59,7 @@ def save_image(image_file):
 
 
 @bp.route('/add-book', methods=['GET', 'POST'])
-def add_book(id):
+def add_book():
     """
     A route that adds a book to the database
     """
