@@ -1,15 +1,13 @@
 """
 A module that handles authentication and authorization views
 """
-from flask import redirect, render_template, url_for, flash, request, current_app, session
+from flask import redirect, render_template, url_for, flash, request
 from app.auth import bp
 from flask_login import login_required, login_user, logout_user, current_user
 from app.auth.forms import LoginForm, RegistrationForm
 from app.models import User
 from werkzeug.urls import url_parse
 from app import db
-from flask_principal import AnonymousIdentity, Identity, Principal, RoleNeed, UserNeed, identity_changed, identity_loaded
-from app import admin_permission
 
 
 @bp.route('/login', methods=['GET', 'POST'])
@@ -28,8 +26,6 @@ def login():
             flash('Invalid username or password', 'danger')
             return redirect(url_for('auth.login'))
         login_user(user)
-        identity_changed.send(
-            current_app._get_current_object(), identity=Identity(user.name))
         # Parse the url to find out the page user is to be referred to
         next_page = request.args.get('next')
         # Check if next page is empty or if network location is not empty
@@ -41,7 +37,6 @@ def login():
 
 
 @bp.route('/register', methods=['GET', 'POST'])
-@admin_permission.require(http_exception=404)
 def register():
     """
     Route that handles registration of new users to the system
@@ -67,26 +62,4 @@ def logout():
     Route that handles logging users out
     """
     logout_user()
-    for key in ("identity.name", "identity.auth_type"):
-        session.pop(key, None)
-    identity_changed.send(
-        current_app._get_current_object(), identity=AnonymousIdentity())
     return redirect(url_for('auth.login'))
-
-
-@identity_loaded.connect
-def on_identity_loaded(sender, identity):
-    """
-    Handle the identity_loaded signal.
-    """
-    # Set the identity user object
-    identity.user = current_user
-
-    # Add the UserNeed to the identity
-    if hasattr(current_user, "name"):
-        identity.provides.add(UserNeed(current_user.name))
-
-    # Assuming the User model has a list of roles, update the
-    # identity with the roles that the user provides
-    if hasattr(current_user, "informs_role"):
-        identity.provides.add(RoleNeed(current_user.informs_role))
