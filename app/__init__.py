@@ -7,6 +7,7 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager
 from config import Config
 from flask_migrate import Migrate
+from flask_ckeditor import CKEditor
 
 
 # Create instances from the installed extensions
@@ -17,6 +18,7 @@ login.login_view = 'auth.login'
 login.login_message = 'Please log in to access this page'
 # Categorize the login required message
 login.login_message_category = 'info'
+ckeditor = CKEditor()
 
 
 def create_app(config_class=Config):
@@ -32,6 +34,7 @@ def create_app(config_class=Config):
     db.init_app(app)
     migrate.init_app(app, db)
     login.init_app(app)
+    ckeditor.init_app(app)
 
     # register blueprints to the application
     from app.auth import bp as auth_bp
