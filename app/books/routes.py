@@ -2,9 +2,11 @@
 A module that contains routes related to the book blueprint
 """
 from turtle import title
+
+from flask_login import current_user
 from app import db
 from flask import flash, redirect, render_template, request
-from app.models import Book
+from app.models import Book, user_book, User
 from app.books import bp
 
 
@@ -38,7 +40,11 @@ def borrow_book(id):
     A route that handles borrowing the book
     borrower's id and book's id is added to the user_book association table
     """
-    pass
+    book = Book.query.filter_by(id=id).first()
+    user = User.query.filter_by(id=current_user.id).first()
+    user.borrowed_books.append(book)
+    db.session.commit()
+    return redirect(request.referrer)
 
 
 @bp.route('/return/<id>', methods=['GET', 'POST'])
@@ -47,4 +53,9 @@ def return_book(id):
     A user can return a book they're done reading
     The route clears the book and user id from the association table
     """
-    pass
+    book = Book.query.filter_by(id=id).first()
+    user = User.query.filter_by(id=current_user.id).first()
+    user.borrowed_books.remove(book)
+    db.session.commit()
+    return redirect(request.referrer)
+
