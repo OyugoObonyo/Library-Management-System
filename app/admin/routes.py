@@ -6,10 +6,19 @@ import uuid
 from app import db
 from PIL import Image
 from app.models import Book, User
-from flask import current_app, flash, redirect, render_template, request, url_for
+from flask import current_app, flash, redirect, render_template, request, url_for, abort
+from flask_login import current_user
 from app.admin import bp
 from werkzeug.exceptions import RequestEntityTooLarge
 from app.admin.forms import AddBookForm, UpdateBookForm
+
+
+def check_admin():
+    """
+    A function that checks if a user is an administrator
+    """
+    if not current_user.is_admin:
+        abort(403)
 
 
 @bp.route('/admin')
@@ -17,8 +26,19 @@ def admin():
     """
     The route that renders the admin dashboard
     """
+    check_admin()
     books = Book.query.all()
-    return render_template('admin/index.html', books=books)
+    return render_template('admin/index.html', title="Admin", books=books)
+
+
+@bp.route('/users')
+def users():
+    """
+    route that retrieves all the users from the database
+    """
+    check_admin()
+    users = User.query.all()
+    return render_template('auth/users', title="Users", users=users)
 
 
 def save_image(image_file):
@@ -43,6 +63,7 @@ def add_book(id):
     """
     A route that adds a book to the database
     """
+    check_admin()
     form = AddBookForm()
     image = form.image.data
     image_url = save_image(image)
@@ -69,6 +90,7 @@ def update_book(id):
     """
     A route that updates the properties of a particular book in the database
     """
+    check_admin()
     book = Book.query.get_or_404(id).first()
     form = UpdateBookForm()
     if form.validate_on_submit():
@@ -95,6 +117,7 @@ def delete_book(id):
     A route that handles deleting a book from the database
     It also deletes the book's cover image as well
     """
+    check_admin()
     book = Book.query.get_or_404(id).first()
     image_file = book.img_url
     delete_image(image_file)
