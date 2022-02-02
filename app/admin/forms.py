@@ -3,7 +3,7 @@ A module with forms related to the auth blueprint
 """
 from flask_wtf import FlaskForm
 from wtforms import StringField, IntegerField, SubmitField
-from wtforms.validators import DataRequired
+from wtforms.validators import DataRequired, NumberRange
 from flask_wtf.file import FileField, FileAllowed
 
 
@@ -14,8 +14,8 @@ class AddBookForm(FlaskForm):
     title = StringField('Book title', validators=[DataRequired()])
     synopsis = StringField('Book description', validators=[DataRequired()])
     author = StringField('Author', validators=[DataRequired()])
-    year_of_publish = IntegerField('Year of publishment', validators=[DataRequired()])
-    category = StringField('Category', validators=[DataRequired()])
+    # Only accept numbers greater than 0
+    year_of_publish = IntegerField('Year of publishment', validators=[DataRequired(), NumberRange(min=0)])
     image = FileField('Image', validators=[DataRequired(), FileAllowed(['jpg', 'jpeg', 'png'])])
     submit = SubmitField('Add book')
 
