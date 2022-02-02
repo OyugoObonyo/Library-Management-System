@@ -23,3 +23,13 @@ body{
 .leg{
     text-align: center;
 }
+
+/** 404 error page selectors **/
+#error404{
+    margin-top: 20px;
+}
+
+/** 500 error page selectors **/
+#error500{
+    margin-top: 20px;
+}
