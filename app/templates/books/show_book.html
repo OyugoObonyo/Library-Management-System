@@ -10,8 +10,12 @@
                         <img class="img-fluid rounded float-left" src="{{ url_for('static', filename = 'images/books/' + book.img_url ) }}"></a>
                     </div>
                     <div class="container">
-                        <div class="d-flex container" id="useraction">
+                        <div class="container" id="useraction">
+                            {% if book in current_user.borrowed_books %}
+                            <a href="{{ url_for('books.return_book', id=book.id) }}" class="btn btn-outline-dark" tabindex="-1" role="button" >Return book</a>
+                            {% else %}
                             <a href="{{ url_for('books.borrow_book', id=book.id) }}" class="btn btn-outline-dark" tabindex="-1" role="button" >Borrow book</a>
+                            {% endif %}
                         </div>
                     </div>
                 </div>
