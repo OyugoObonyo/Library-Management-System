@@ -1,6 +1,7 @@
 """
 A module that contains routes related to the book blueprint
 """
+from turtle import title
 from app import db
 from flask import flash, redirect, render_template, request
 from app.models import Book
@@ -19,6 +20,16 @@ def get_book(name):
         flash("Sorry, book is unavailable at the moment")
         return redirect(request.referrer)
     return render_template('books/book.html', book=book)
+
+
+@bp.route('/show-book/<id>')
+def show_book(id):
+    """
+    A route that renders book details to a user
+    """
+    book = Book.query.filter_by(id=id).first()
+    title = book.title
+    return render_template('books/show_book.html', title=title, book=book)
 
 
 @bp.route('/borrow/<id>', methods=['GET', 'POST'])
