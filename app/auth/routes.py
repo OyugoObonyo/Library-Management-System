@@ -26,6 +26,9 @@ def login():
             flash('Invalid username or password', 'danger')
             return redirect(url_for('auth.login'))
         login_user(user)
+        # Refer admin to admin page if user is admin
+        if current_user.is_admin:
+            return redirect(url_for('admin.admin'))
         # Parse the url to find out the page user is to be referred to
         next_page = request.args.get('next')
         # Check if next page is empty or if network location is not empty
