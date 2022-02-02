@@ -21,8 +21,16 @@ class User(UserMixin, db.Model):
     name = db.Column(db.String(20), unique=True, nullable=False)
     email = db.Column(db.String(32), unique=True, nullable=False)
     password_hash = db.Column(db.String(128))
+    is_admin = db.Column(db.Boolean, default=False)
     # Attach a record of books borrowed by a user
     borrowed_books = db.relationship('Book', secondary=user_book, backref="borrowers")
+
+    @property
+    def password(self):
+        """
+        Prevent password from being accessed
+        """
+        raise AttributeError('Attribute not accessible.')
 
     def set_password(self, password):
         """
