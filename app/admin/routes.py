@@ -79,7 +79,7 @@ def add_book():
             db.session.add(book)
             db.session.commit()
             flash(f"{book.title} has been succesfully added to the library", "success")
-            return redirect(url_for('main.index'))
+            return redirect(url_for('admin.admin'))
     except RequestEntityTooLarge:
         raise "Maximum upload size allowed is 5MB"
     return render_template('books/create_book.html', title='Create Book', form=form)
