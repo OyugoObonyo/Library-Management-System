@@ -33,3 +33,10 @@ body{
 #error500{
     margin-top: 20px;
 }
+
+/** add_book form selectors **/
+#addbook{
+    margin-top: 50px;
+    display: flex;
+    justify-content: center;
+}
