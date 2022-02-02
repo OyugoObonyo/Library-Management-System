@@ -1,6 +1,11 @@
 /** global selectors **/
 body{
     font-family: 'Poppins', sans-serif;
+    font-weight: 500;
+}
+#mynav{
+    font-weight: 600;
+    font-size: larger;
 }
 
 /** index page selectors **/
@@ -43,4 +48,25 @@ body{
     margin-top: 50px;
     display: flex;
     justify-content: center;
+}
+
+/** show_book selectors **/
+#bookshow{
+    margin-top: 20px;
+}
+#booktitle{
+    font-weight: 500;
+    font-size: x-large;
+}
+#bookauthor{
+    margin-bottom: 15px;
+}
+#booksynopsis{
+    font-weight: 300;
+}
+#useraction{
+    margin-top: 30px;
+    display: flex;
+    justify-content: center;
+
 }
