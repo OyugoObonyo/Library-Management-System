@@ -12,9 +12,11 @@
 <section id="mybooks">
   <div class="container">
     <div class="row">
+      {% for book in books %}
       <div class="col-lg-3 col-md-4 col-sm-12">
-        <div id="col1"><p>col1</p></div>
+        <img src="{{ url_for('static', filename = 'images/books/' + book.img_url ) }}" height = 200 object-fit="centre">
       </div>
+      {% endfor %}
     </div>
   </div>
 </section>
