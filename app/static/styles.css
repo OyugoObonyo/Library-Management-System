@@ -12,6 +12,10 @@ body{
     background-color: blueviolet;
     height: 200;
 }
+#bookpost img{
+    width:100%;
+    margin-bottom: 5px;
+}
 
 /** login page selectors **/
 #loginpage{
