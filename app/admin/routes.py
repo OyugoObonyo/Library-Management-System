@@ -2,6 +2,7 @@
 A module with routes associated to the auth blueprint
 """
 import os
+from turtle import title
 import uuid
 from app import db
 from PIL import Image
@@ -70,11 +71,10 @@ def add_book():
         if form.validate_on_submit():
             image = form.image.data
             image_url = save_image(image)
-            book = Book(name=form.title.data,
+            book = Book(title=form.title.data,
                         synopsis=form.synopsis.data,
                         author=form.author.data,
                         year_of_publish=form.year_of_publish.data,
-                        category=form.category.data,
                         img_url=image_url)
             db.session.add(book)
             db.session.commit()
