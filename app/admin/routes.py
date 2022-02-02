@@ -12,6 +12,15 @@ from werkzeug.exceptions import RequestEntityTooLarge
 from app.admin.forms import AddBookForm, UpdateBookForm
 
 
+@bp.route('/admin')
+def admin():
+    """
+    The route that renders the admin dashboard
+    """
+    books = Book.query.all()
+    return render_template('admin/index.html', books=books)
+
+
 def save_image(image_file):
     """
     Function that saves an image to the filesystem
