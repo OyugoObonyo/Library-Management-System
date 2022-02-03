@@ -4,6 +4,7 @@ A module with routes associated to the auth blueprint
 import os
 from turtle import title
 import uuid
+import html
 from app import db
 from PIL import Image
 from app.models import Book, User
@@ -72,7 +73,7 @@ def add_book():
             image = form.image.data
             image_url = save_image(image)
             book = Book(title=form.title.data,
-                        synopsis=form.synopsis.data,
+                        synopsis=html.unescape(form.synopsis.data),
                         author=form.author.data,
                         year_of_publish=form.year_of_publish.data,
                         img_url=image_url)
@@ -82,7 +83,7 @@ def add_book():
             return redirect(url_for('admin.admin'))
     except RequestEntityTooLarge:
         raise "Maximum upload size allowed is 5MB"
-    return render_template('books/create_book.html', title='Create Book', form=form)
+    return render_template('books/create_book.html', title='Add a book', form=form)
 
 
 @bp.route('/update/<id>', methods=['GET', 'PUT'])
@@ -118,9 +119,9 @@ def delete_book(id):
     It also deletes the book's cover image as well
     """
     check_admin()
-    book = Book.query.get_or_404(id).first()
+    book = Book.query.get_or_404(id)
     image_file = book.img_url
     delete_image(image_file)
     db.session.delete(book)
     db.session.commit()
-    return redirect(request.referrer)
+    return redirect(url_for('admin.admin'))
