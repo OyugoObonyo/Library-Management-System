@@ -36,7 +36,7 @@
           {% endif %}
         </div>
         <div class="row mb-4">
-            {{ form.synopsis.label(class="col-sm-3 col-form-label") }}
+            {{ form.synopsis.label(class="col-sm-3 col-form-label")}}
             {% if form.synopsis.errors %}
               {{ form.synopsis(class="form-control is-invalid") }}
                 <div class="invalid-feedback">
@@ -45,7 +45,7 @@
                   {% endfor %}
                 </div>
             {% else %}
-                <div class="col-sm-8" id="editor">
+                <div class="col-sm-8">
                     {{ form.synopsis(class="form-control") }}
                 </div>
             {% endif %}
