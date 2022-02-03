@@ -86,22 +86,24 @@ def add_book():
     return render_template('books/create_book.html', title='Add a book', form=form)
 
 
-@bp.route('/update/<id>', methods=['GET', 'PUT'])
+@bp.route('/update/<id>', methods=['GET', 'POST'])
 def update_book(id):
     """
     A route that updates the properties of a particular book in the database
     """
     check_admin()
-    book = Book.query.get_or_404(id).first()
+    book = Book.query.get_or_404(id)
     form = UpdateBookForm()
+    # Preload book values on CKeditor form
+    article_title = book.title
+    article_body = book.synopsis
     if form.validate_on_submit():
         book.title = form.title.data
         book.synopsis = form.synopsis.data
-        book.category = form.category.data
         db.session.commit()
         flash(f"{book.title} has been succesfully updated", "success")
-        return redirect(request.referrer)
-    return render_template('books/update_book.html', title='Update details', form=form)
+        return redirect(url_for('admin.admin'))
+    return render_template('books/update_book.html', title='Update book details', form=form, article_body=article_body, article_title=article_title)
 
 
 def delete_image(image_file):
