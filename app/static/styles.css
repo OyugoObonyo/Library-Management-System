@@ -73,3 +73,10 @@ body{
 #updatebutton{
     margin-right: 5px;
 }
+
+/** update book form selectors **/
+#updatebook{
+    margin-top: 50px;
+    display: flex;
+    justify-content: center;
+}
