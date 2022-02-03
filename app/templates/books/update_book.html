@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<section id="updatebook">
+    <form action="" novalidate> 
+        {{ form.hidden_tag() }}
+        <div class="leg"><legend class="border-bottom mb-4"> Update book details </legend></div>
+        <div class="row mb-4">
+          {{ form.title.label(class="col-sm-3 col-form-label") }}
+          {% if form.title.errors %}
+            {{ form.title(class="form-control is-invalid") }}
+              <div class="invalid-feedback">
+                {% for error in form.title.errors %}
+                  <span style="color: red;">{{ error }}</span>
+                {% endfor %}
+              </div>
+          {% else %}
+            <div class="col-sm-8">
+              {{ form.title(class="form-control", value=article_title) }}
+            </div>
+          {% endif %}
+        </div>
+        <div class="row mb-4">
+            {{ form.synopsis.label(class="col-sm-3 col-form-label")}}
+            {% if form.synopsis.errors %}
+              {{ form.synopsis(class="form-control is-invalid") }}
+                <div class="invalid-feedback">
+                  {% for error in form.synopsis.errors %}
+                    <span style="color: red;">{{ error }}</span>
+                  {% endfor %}
+                </div>
+            {% else %}
+                <div class="col-sm-8">
+                    {{ ckeditor.create(value=article_body) }}
+                </div>
+            {% endif %}
+        </div>
+        {{ form.submit(class="btn btn-outline-dark") }}
+    </form>
+</section>
+{% endblock %}
