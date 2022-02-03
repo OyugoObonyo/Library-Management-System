@@ -8,16 +8,7 @@
                 <div class="container">
                     <div id="bookpic">
                         <img class="img-fluid rounded float-left" src="{{ url_for('static', filename = 'images/books/' + book.img_url ) }}"></a>
-                    </div>
-                    <div class="container">
-                        <div class="container" id="useraction">
-                            {% if book in current_user.borrowed_books %}
-                            <a href="{{ url_for('books.return_book', id=book.id) }}" class="btn btn-outline-dark" tabindex="-1" role="button" >Return book</a>
-                            {% else %}
-                            <a href="{{ url_for('books.borrow_book', id=book.id) }}" class="btn btn-outline-dark" tabindex="-1" role="button" >Borrow book</a>
-                            {% endif %}
-                        </div>
-                    </div>
+                    </div>                    
                 </div>
             </div>
             <div class="col-lg-8">
@@ -30,6 +21,20 @@
                 <div class="container-fluid" id="booksynopsis">
                    <p>{{ book.synopsis }}</p>
                </div>
+               <div class="container">
+                <div class="container" id="useraction">
+                    {% if current_user.is_admin %}
+                      <a href="{{ url_for('admin.update_book', id=book.id) }}" class="btn btn-outline-dark" tabindex="-1" role="button" id="updatebutton">Update details</a><br>
+                      <a href="{{ url_for('admin.delete_book', id=book.id) }}" class="btn btn-outline-danger" tabindex="-1" role="button" >Remove book</a>
+                    {% elif not current_user.is_admin %}
+                      {% if book in current_user.borrowed_books %}
+                      <a href="{{ url_for('books.return_book', id=book.id) }}" class="btn btn-outline-dark" tabindex="-1" role="button" >Return book</a>
+                      {% else %}
+                      <a href="{{ url_for('books.borrow_book', id=book.id) }}" class="btn btn-outline-dark" tabindex="-1" role="button" >Borrow book</a>
+                      {% endif %}
+                    {% endif %}
+                </div>
+            </div>
             </div>
         </div>
     </div>
