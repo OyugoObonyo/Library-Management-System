@@ -27,5 +27,4 @@ class UpdateBookForm(FlaskForm):
     """
     title = StringField('Book title', validators=[DataRequired()])
     synopsis = CKEditorField('Book description', validators=[DataRequired()])
-    category = StringField('Category', validators=[DataRequired()])
     submit = SubmitField('Update book')
