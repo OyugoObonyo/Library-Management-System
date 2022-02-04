@@ -86,13 +86,13 @@ def add_book():
     return render_template('books/create_book.html', title='Add a book', form=form)
 
 
-@bp.route('/update/<id>', methods=['GET', 'POST'])
+@bp.route('/update/<id>', methods=['GET', 'PUT'])
 def update_book(id):
     """
     A route that updates the properties of a particular book in the database
     """
     check_admin()
-    book = Book.query.get_or_404(id)
+    book = Book.query.filter_by(id=id).first()
     form = UpdateBookForm()
     # Preload book values on CKeditor form
     article_title = book.title
@@ -121,7 +121,7 @@ def delete_book(id):
     It also deletes the book's cover image as well
     """
     check_admin()
-    book = Book.query.get_or_404(id)
+    book = Book.query.filter_by(id=id).first()
     image_file = book.img_url
     delete_image(image_file)
     db.session.delete(book)
