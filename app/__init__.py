@@ -38,16 +38,16 @@ def create_app(config_class=Config):
 
     # register blueprints to the application
     from app.auth import bp as auth_bp
-    app.register_blueprint(auth_bp)
+    app.register_blueprint(auth_bp, url_prefix='/auth')
 
     from app.errors import bp as errors_bp
     app.register_blueprint(errors_bp)
 
     from app.admin import bp as admin_bp
-    app.register_blueprint(admin_bp)
+    app.register_blueprint(admin_bp, url_prefix='/admin')
 
     from app.books import bp as books_bp
-    app.register_blueprint(books_bp)
+    app.register_blueprint(books_bp, url_prefix='/books')
 
     from app.main import bp as main_bp
     app.register_blueprint(main_bp)
