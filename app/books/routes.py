@@ -1,8 +1,6 @@
 """
 A module that contains routes related to the book blueprint
 """
-from turtle import title
-
 from flask_login import current_user
 from app import db
 from flask import flash, redirect, render_template, request
@@ -59,3 +57,12 @@ def return_book(id):
     db.session.commit()
     return redirect(request.referrer)
 
+
+@bp.route('/my-books', methods=['GET'])
+def my_books():
+    """
+    A route that renders a page showing all books borrowed by a particular user
+    """
+    books = current_user.borrowed_books
+    library = len(books)
+    return render_template('books/my_books.html', books=books, library=library)
