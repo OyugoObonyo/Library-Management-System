@@ -96,12 +96,15 @@ def update_book(id):
     # Preload book values on CKeditor form
     if form.validate_on_submit():
         book.title = form.title.data
+        book.author = form.author.data
         book.synopsis = form.synopsis.data
+        book.year_of_publish = form.year_of_publish.data
         db.session.commit()
         flash(f"{book.title} has been succesfully updated", "success")
         return redirect(url_for('admin.admin'))
     elif request.method == 'GET':
         form.title.data = book.title
+        form.author.data = book.author
         form.synopsis.data = book.synopsis
     return render_template('books/update_book.html', title='Update book details', form=form)
 
