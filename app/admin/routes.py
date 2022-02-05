@@ -2,7 +2,6 @@
 A module with routes associated to the auth blueprint
 """
 import os
-from turtle import title
 import uuid
 import html
 from app import db
@@ -86,7 +85,7 @@ def add_book():
     return render_template('books/create_book.html', title='Add a book', form=form)
 
 
-@bp.route('/update/<id>', methods=['GET', 'PUT'])
+@bp.route('/update/<id>', methods=['GET', 'POST'])
 def update_book(id):
     """
     A route that updates the properties of a particular book in the database
@@ -95,15 +94,16 @@ def update_book(id):
     book = Book.query.filter_by(id=id).first()
     form = UpdateBookForm()
     # Preload book values on CKeditor form
-    article_title = book.title
-    article_body = book.synopsis
     if form.validate_on_submit():
         book.title = form.title.data
         book.synopsis = form.synopsis.data
         db.session.commit()
         flash(f"{book.title} has been succesfully updated", "success")
         return redirect(url_for('admin.admin'))
-    return render_template('books/update_book.html', title='Update book details', form=form, article_body=article_body, article_title=article_title)
+    elif request.method == 'GET':
+        form.title.data = book.title
+        form.synopsis.data = book.synopsis
+    return render_template('books/update_book.html', title='Update book details', form=form)
 
 
 def delete_image(image_file):
