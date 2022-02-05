@@ -16,7 +16,7 @@ def get_book(name):
     A route that displays a particular book with a particular id
     the route renders a book page in case it's successful
     """
-    book = Book.query.filter_by(Book.title == name)
+    book = Book.query.filter_by(title=name)
     # Return flash message and redirect to requesting page if name isn't found
     if book is None:
         flash("Sorry, book is unavailable at the moment")
