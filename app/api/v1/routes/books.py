@@ -7,13 +7,6 @@ from app.models import Book
 from app.api import bp
 
 
-# api test
-@bp.route('/test', methods=['GET'], strict_slashes=False)
-def get_test():
-    message = "Hello Test!"
-    return jsonify({"message": message})
-
-
 # route that returns a list of all books
 @bp.route('/books', methods=['GET'], strict_slashes=False)
 def get_books():
@@ -56,24 +49,31 @@ def get_book(id):
 
 
 # api route that updates details of a particular book
-@bp.route('/books/<int:id>', methods=['PUT'], strict_slashes=False)
+@bp.route('/books/update/<int:id>', methods=['PUT'], strict_slashes=False)
 def update_book(id):
     if request.is_json:
         book = Book.query.get(id)
         if book is None:
             return make_response(jsonify({"error": "Book does not exist"}), 404)
 
-        if 'email' not in request.get_json():
-            abort(400, description="Missing email")
-
-        if 'password' not in request.get_json():
-            abort(400, description="Missing password")
-
-        book.title = request.json['title']
-        book.synopsis = request.json['synopsis']
+        ignore = ['id', 'img_url']
+        data = request.get_json()
+        for key, value in data.items():
+            if key not in ignore:
+                setattr(book, key, value)
+        db.session.commit()
+        return make_response(jsonify({"Success": "Book succesfully updated"}), 200)
+    else:
+        return make_response(jsonify({"error": "Input not a JSON"}), 400)
 
 
 # api route that deletes a book
-@bp.route('/books/<string:name>', methods=['DELETE'], strict_slashes=False)
-def delete_book(name):
-    pass
+@bp.route('/books/delete/<int:id>', methods=['DELETE'], strict_slashes=False)
+def delete_book(id):
+    book = Book.query.get(id)
+    if book is None:
+        return make_response(jsonify({"error": "Book does not exist"}), 404)
+
+    db.session.delete(book)
+    db.session.commit()
+    return make_response(jsonify({"Success": "Book successfully deleted"}), 200)
