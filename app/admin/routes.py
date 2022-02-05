@@ -106,6 +106,7 @@ def update_book(id):
         form.title.data = book.title
         form.author.data = book.author
         form.synopsis.data = book.synopsis
+        form.year_of_publish.data = book.year_of_publish
     return render_template('books/update_book.html', title='Update book details', form=form)
 
 
