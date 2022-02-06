@@ -1,19 +1,34 @@
 """
 A module that handles all default RESTful API actions for users
 """
-from logging import exception
 from flask import jsonify, request, make_response, current_app
 from app import db
 from app.models import User
 from app.api import bp
 import jwt
 from functools import wraps
+import datetime
 
 
 @bp.route('/login', strict_slashes=False)
 def login():
+    # get authorization data
     auth = request.authorization
-    if 
+
+    # check if any auth components are missing
+    if not auth or not auth.username or not auth.password:
+        return make_response(jsonify({"error": "Verification has failed"}), 401, {'WWW-Authenticate': 'Basic realm="Login required"'})
+
+    user = User.query.filter_by(name=auth.username).first()
+
+    if not user:
+        return make_response('Verification has failed', 401, {'WWW-Authenticate': 'Basic realm="Login required"'})
+
+    if user.check_password(auth.password):
+        token = jwt.encode({'id': user.id, 'exp': datetime.datetime.utcnow() + datetime.timedelta(minutes=30)}, current_app.config['SECRET_KEY'])
+        return jsonify({'token': token.decode('UTF-8')})
+    else:
+        return make_response(jsonify({"error": "Verification has failed"}), 401, {'WWW-Authenticate': 'Basic realm="Login required"'})
 
 
 # check for token and provide access to user with valid tokens only
