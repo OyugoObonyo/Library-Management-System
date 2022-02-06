@@ -22,13 +22,14 @@ def login():
     user = User.query.filter_by(name=auth.username).first()
 
     if not user:
-        return make_response('Verification has failed', 401, {'WWW-Authenticate': 'Basic realm="Login required"'})
+        return make_response(jsonify({"error": "Verification has failed"}), 401, {'WWW-Authenticate': 'Basic realm="Login required"'})
 
     if user.check_password(auth.password):
         token = jwt.encode({'id': user.id, 'exp': datetime.datetime.utcnow() + datetime.timedelta(minutes=30)}, current_app.config['SECRET_KEY'])
-        return jsonify({'token': token.decode('UTF-8')})
-    else:
-        return make_response(jsonify({"error": "Verification has failed"}), 401, {'WWW-Authenticate': 'Basic realm="Login required"'})
+        return jsonify({'token': token})
+
+
+    return make_response(jsonify({"error": "Verification has failed"}), 401, {'WWW-Authenticate': 'Basic realm="Login required"'})
 
 
 # check for token and provide access to user with valid tokens only
@@ -39,7 +40,7 @@ def check_for_token(func):
         # initialize token with value of none
         token = None
         # check if token is passed in the request header
-        if 'x-access-token' in  request.headers:
+        if 'x-access-token' in request.headers:
             token = request.headers['x-access-token']
 
         if not token:
