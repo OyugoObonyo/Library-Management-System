@@ -1,6 +1,7 @@
 """
 A module that handles all default RESTful API actions for users
 """
+from unicodedata import name
 from flask import jsonify, request, make_response, current_app
 from app import db
 from app.models import User
@@ -10,30 +11,11 @@ from functools import wraps
 import datetime
 
 
-@bp.route('/login', strict_slashes=False)
-def login():
-    # get authorization data
-    auth = request.authorization
-
-    # check if any auth components are missing
-    if not auth or not auth.username or not auth.password:
-        return make_response(jsonify({"error": "Verification has failed"}), 401, {'WWW-Authenticate': 'Basic realm="Login required"'})
-
-    user = User.query.filter_by(name=auth.username).first()
-
-    if not user:
-        return make_response(jsonify({"error": "Verification has failed"}), 401, {'WWW-Authenticate': 'Basic realm="Login required"'})
-
-    if user.check_password(auth.password):
-        token = jwt.encode({'id': user.id, 'exp': datetime.datetime.utcnow() + datetime.timedelta(minutes=30)}, current_app.config['SECRET_KEY'])
-        return jsonify({'token': token})
-
-
-    return make_response(jsonify({"error": "Verification has failed"}), 401, {'WWW-Authenticate': 'Basic realm="Login required"'})
-
-
 # check for token and provide access to user with valid tokens only
 def check_for_token(func):
+    """
+    decorator function that works with the token
+    """
     @wraps(func)
     # wrap function with any number of positional or keyword args
     def wrapped(*args, **kwargs):
@@ -48,22 +30,43 @@ def check_for_token(func):
 
         try:
             # decode the jwt token if it exists
-            data = jwt.decode(token, current_app.config['SECRET_KEY'])
+            data = jwt.decode(token, current_app.config['SECRET_KEY'], algorithms="HS256")
             # query the user in the db whom the token belongs to
-            c_user = User.query.filter_by(id=data).first()
-        except:
+            current_user = User.query.filter_by(name=data['name']).first()
+        except Exception as e:
             # return token invalid error in case token does not match
             return make_response(jsonify({"error": "token is invalid"}), 401)
-
         # pass user object along with positional and kw args to the route in case token is correct
-        return func(c_user, *args, **kwargs)
+        return func(current_user, *args, **kwargs)
     return wrapped
+
+
+@bp.route('/login', strict_slashes=False)
+def login():
+    # get authorization data
+    auth = request.authorization
+
+    # check if any auth components are missing
+    if not auth or not auth.username or not auth.password:
+        return make_response(jsonify({"error": "Verification has failed"}), 401, {'WWW-Authenticate': 'Basic realm="Login required"'})
+
+    user = User.query.filter_by(name=auth.username).first()
+    # return error if user does not exist
+    if not user:
+        return make_response(jsonify({"error": "Verification has failed"}), 401, {'WWW-Authenticate': 'Basic realm="Login required"'})
+
+    if user.check_password(auth.password):
+        token = jwt.encode({'name': user.id, 'exp': datetime.datetime.utcnow() + datetime.timedelta(minutes=30)}, current_app.config['SECRET_KEY'], algorithms="HS256")
+        print(token)
+        return jsonify({'token': token})
+    # return error if password is incorrect
+    return make_response(jsonify({"error": "Verification has failed, password is incorrect"}), 401, {'WWW-Authenticate': 'Basic realm="Login required"'})
 
 
 # Retrieves all user accounts
 @bp.route('/users', methods=['GET'], strict_slashes=False)
 @check_for_token
-def get_users(c_user):
+def get_users(current_user):
     users = User.query.all()
     user_list = []
     for user in users:
@@ -79,7 +82,7 @@ def get_users(c_user):
 # route that retrieves a particular user account
 @bp.route('/user/<int:id>', methods=['GET'], strict_slashes=False)
 @check_for_token
-def get_user(c_user, id):
+def get_user(current_user, id):
     user = User.query.get(id)
     if user is None:
         return make_response(jsonify({"error": "user does not exist"}), 404)
@@ -94,7 +97,7 @@ def get_user(c_user, id):
 # create api route that creates a user account
 @bp.route('/user', methods=['POST'], strict_slashes=False)
 @check_for_token
-def create_user():
+def create_user(current_user):
     if request.is_json:
         if 'name' not in request.get_json():
             return make_response(jsonify({"error": "name is missing"}), 400)
@@ -122,7 +125,7 @@ def create_user():
 # route that updates particular info about a user
 @bp.route('/user/<int:id>', methods=['PUT'], strict_slashes=False)
 @check_for_token
-def update_user(c_user, id):
+def update_user(current_user, id):
     if request.is_json:
         user = User.query.get(id)
         if user is None:
