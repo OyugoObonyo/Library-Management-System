@@ -27,13 +27,63 @@ def get_books():
     return jsonify({"books": book_list})
 
 
-@bp.route('/book_count', methods=['GET'], strict_slashes=False)
+@bp.route('/books/count', methods=['GET'], strict_slashes=False)
 def number_books():
     """
-    Returns the total number of books in the database
+    Retrieves the total number of books in the database
     """
     book_count = Book.query.count()
     return jsonify({"Total number of books": book_count})
+
+
+@bp.route('/books/author', methods=['GET'], strict_slashes=False)
+def book_author():
+    """
+    Retrieves books from a particular author in the db
+    """
+    # check if request is json
+    if request.is_json:
+        # ensure author is passed as parameter
+        if 'author' not in request.get_json():
+            return make_response(jsonify({"error": "author name is missing"}), 400)
+        author = request.json['author']
+        books = Book.query.filter_by(author=author).all()
+        book_count = len(books)
+        if book_count == 0:
+            return jsonify({"message": "A book by this author doesn't currently exist"})
+        books_list = []
+        for book in books:
+            book_data = {
+                'id': book.id,
+                'title': book.title,
+                'author': book.author,
+                'synopsis': book.synopsis,
+                'Year of publishment': book.year_of_publish
+            }
+            books_list.append(book_data)
+        return jsonify({"author": author, "book_count": book_count, "books": books_list})
+    else:
+        return make_response(jsonify({"error": "Input not a JSON"}), 400)
+
+
+@bp.route('/books/mine', methods=['GET'], strict_slashes=False)
+@check_for_token
+def user_books(current_user):
+    """
+    Returns the total number of books in the database
+    """
+    books = current_user.borrowed_books
+    books_list = []
+    for book in books:
+        book_data = {
+            'id': book.id,
+            'title': book.title,
+            'author': book.author,
+            'synopsis': book.synopsis,
+            'Year of publishment': book.year_of_publish
+        }
+        books_list.append(book_data)
+    return jsonify({"books": books_list})
 
 
 @bp.route('/books/<string:title>', methods=['GET'], strict_slashes=False)
