@@ -73,6 +73,9 @@ def user_books(current_user):
     Returns the total number of books in the database
     """
     books = current_user.borrowed_books
+    books_count = len(books)
+    if books_count == 0:
+        return jsonify({"message":"You haven't borrowed any book yet"})
     books_list = []
     for book in books:
         book_data = {
@@ -83,7 +86,7 @@ def user_books(current_user):
             'Year of publishment': book.year_of_publish
         }
         books_list.append(book_data)
-    return jsonify({"books": books_list})
+    return jsonify({"books_count": books_count, "books": books_list})
 
 
 @bp.route('/books/<string:title>', methods=['GET'], strict_slashes=False)
