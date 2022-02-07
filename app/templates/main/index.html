@@ -1,18 +1,9 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<section id="mysearch">
-  <div class="container">
-    <form class="d-flex">
-      <input class="form-control me-2" type="search" placeholder="Search a book by title or author..." aria-label="Search">
-      <button class="btn btn-outline-dark" type="submit">Search</button>
-    </form>
-  </div>
-</section>
 <section id="mybooks">
   <div class="container">
     <div class="row" id="bookpost">
-      {% block myBooks %}{% endblock %}
       {% for book in books %}
       <div class="col-lg-3 col-md-4 col-sm-12">
         <a href="{{ url_for('books.show_book', id= book.id ) }}"><img class="img-fluid rounded float-left" src="{{ url_for('static', filename = 'images/books/' + book.img_url ) }}" alt="{{ book.title }}"></a>
