@@ -5,11 +5,14 @@ from flask import jsonify, request, make_response, abort
 from app import db
 from app.models import Book
 from app.api import bp
+from app.api.v1.routes.users import check_for_token
 
 
-# route that returns a list of all books
 @bp.route('/books', methods=['GET'], strict_slashes=False)
 def get_books():
+    """
+    Retrieves all books from the database
+    """
     books = Book.query.all()
     book_list = []
     for book in books:
@@ -24,18 +27,21 @@ def get_books():
     return jsonify({"books": book_list})
 
 
-# route that returns the total number of books in the db
 @bp.route('/book_count', methods=['GET'], strict_slashes=False)
 def number_books():
+    """
+    Returns the total number of books in the database
+    """
     book_count = Book.query.count()
     return jsonify({"Total number of books": book_count})
 
 
-# create route that returns a book with a particular name
-# if book with name doesn't exist, return error messages
-@bp.route('/books/<int:id>', methods=['GET'], strict_slashes=False)
-def get_book(id):
-    book = Book.query.get(id)
+@bp.route('/books/<string:title>', methods=['GET'], strict_slashes=False)
+def get_book(title):
+    """
+    Returns information about a book with a particular title
+    """
+    book = Book.query.filter_by(title=title).first()
     if book is None:
         return make_response(jsonify({"error": "Book does not exist"}), 404)
     book_data = {
@@ -48,11 +54,17 @@ def get_book(id):
     return jsonify({"Book": book_data})
 
 
-# api route that updates details of a particular book
-@bp.route('/books/update/<int:id>', methods=['PUT'], strict_slashes=False)
-def update_book(id):
+@bp.route('/books/update/<string:title>', methods=['PUT'], strict_slashes=False)
+@check_for_token
+def update_book(current_user, title):
+    """
+    Updates a book resource in the database
+    """
+    # Make this API accessible to admin users only
+    if not current_user.is_admin:
+        return make_response(jsonify({"error": "Action not allowed for this user"}), 403)
     if request.is_json:
-        book = Book.query.get(id)
+        book = Book.query.filter_by(title=title).first()
         if book is None:
             return make_response(jsonify({"error": "Book does not exist"}), 404)
 
@@ -67,10 +79,15 @@ def update_book(id):
         return make_response(jsonify({"error": "Input not a JSON"}), 400)
 
 
-# api route that deletes a book
-@bp.route('/books/delete/<int:id>', methods=['DELETE'], strict_slashes=False)
-def delete_book(id):
-    book = Book.query.get(id)
+@bp.route('/books/delete/<string:title>', methods=['DELETE'], strict_slashes=False)
+@check_for_token
+def delete_book(current_user, title):
+    """
+    Deletes a book from the database
+    """
+    if not current_user.is_admin:
+        return make_response(jsonify({"error": "action not allowed for this user"}), 403)
+    book = Book.query.filter_by(title=title).first()
     if book is None:
         return make_response(jsonify({"error": "Book does not exist"}), 404)
 

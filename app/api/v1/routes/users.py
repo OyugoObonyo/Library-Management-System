@@ -43,6 +43,9 @@ def check_for_token(func):
 
 @bp.route('/login', strict_slashes=False)
 def login():
+    """
+    login route that enables users to get jwt tokens unique to each user
+    """
     # get authorization data
     auth = request.authorization
 
@@ -56,17 +59,21 @@ def login():
         return make_response(jsonify({"error": "Verification has failed"}), 401, {'WWW-Authenticate': 'Basic realm="Login required"'})
 
     if user.check_password(auth.password):
-        token = jwt.encode({'name': user.id, 'exp': datetime.datetime.utcnow() + datetime.timedelta(minutes=30)}, current_app.config['SECRET_KEY'], algorithms="HS256")
+        token = jwt.encode({'name': user.name, 'exp': datetime.datetime.utcnow() + datetime.timedelta(minutes=30)}, current_app.config['SECRET_KEY'])
         print(token)
         return jsonify({'token': token})
     # return error if password is incorrect
     return make_response(jsonify({"error": "Verification has failed, password is incorrect"}), 401, {'WWW-Authenticate': 'Basic realm="Login required"'})
 
 
-# Retrieves all user accounts
 @bp.route('/users', methods=['GET'], strict_slashes=False)
 @check_for_token
 def get_users(current_user):
+    """
+    Retrieves all user account details
+    """
+    if not current_user.is_admin:
+        return make_response(jsonify({"error": "action not allowed for this user"}), 403)
     users = User.query.all()
     user_list = []
     for user in users:
@@ -79,10 +86,14 @@ def get_users(current_user):
     return jsonify({"users": user_list})
 
 
-# route that retrieves a particular user account
 @bp.route('/user/<int:id>', methods=['GET'], strict_slashes=False)
 @check_for_token
 def get_user(current_user, id):
+    """
+    Retrieves a user with a particular id from the database
+    """
+    if not current_user.is_admin:
+        return make_response(jsonify({"error": "action not allowed for this user"}), 403)
     user = User.query.get(id)
     if user is None:
         return make_response(jsonify({"error": "user does not exist"}), 404)
@@ -98,6 +109,11 @@ def get_user(current_user, id):
 @bp.route('/user', methods=['POST'], strict_slashes=False)
 @check_for_token
 def create_user(current_user):
+    """
+    Creates a user in the database
+    """
+    if not current_user.is_admin:
+        return make_response(jsonify({"error": "action not allowed for this user"}), 403)
     if request.is_json:
         if 'name' not in request.get_json():
             return make_response(jsonify({"error": "name is missing"}), 400)
@@ -145,7 +161,12 @@ def update_user(current_user, id):
 # route that deletes a particular user account
 @bp.route('/user/<int:id>', methods=['DELETE'], strict_slashes=False)
 @check_for_token
-def delete_user(c_user, id):
+def delete_user(current_user, id):
+    """
+    Deletes a user from the database
+    """
+    if not current_user.is_admin:
+        return make_response(jsonify({"error": "action not allowed for this user"}), 403)
     user = User.query.get(id)
     if user is None:
         return make_response(jsonify({"error": "User does not exist"}), 404)
