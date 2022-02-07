@@ -1,7 +1,6 @@
 """
 A module that handles all default RESTful API actions for users
 """
-from unicodedata import name
 from flask import jsonify, request, make_response, current_app
 from app import db
 from app.models import User
@@ -84,6 +83,15 @@ def get_users(current_user):
         }
         user_list.append(user_data)
     return jsonify({"users": user_list})
+
+
+@bp.route('/users/count', methods=['GET'], strict_slashes=False)
+def number_users():
+    """
+    Returns the total number of users in the database
+    """
+    users_count = User.query.count()
+    return jsonify({"Total number of books": users_count})
 
 
 @bp.route('/user/<int:id>', methods=['GET'], strict_slashes=False)
