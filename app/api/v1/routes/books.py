@@ -72,6 +72,9 @@ def user_books(current_user):
     """
     Returns the total number of books in the database
     """
+    # handle the off chance that a user trying to consume this API is anonymous
+    if current_user is None:
+        return make_response(jsonify({"error": "action not allowed for this user"}), 403)
     books = current_user.borrowed_books
     books_count = len(books)
     if books_count == 0:
@@ -113,6 +116,10 @@ def update_book(current_user, title):
     """
     Updates a book resource in the database
     """
+    # handle the off chance that a user trying to consume this API is anonymous
+    if current_user is None:
+        return make_response(jsonify({"error": "action not allowed for this user"}), 403)
+
     # Make this API accessible to admin users only
     if not current_user.is_admin:
         return make_response(jsonify({"error": "Action not allowed for this user"}), 403)
@@ -138,6 +145,9 @@ def delete_book(current_user, title):
     """
     Deletes a book from the database
     """
+    # handle the off chance that a user trying to consume this API is anonymous
+    if current_user is None:
+        return make_response(jsonify({"error": "action not allowed for this user"}), 403)
     if not current_user.is_admin:
         return make_response(jsonify({"error": "action not allowed for this user"}), 403)
     book = Book.query.filter_by(title=title).first()

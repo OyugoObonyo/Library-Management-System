@@ -1,6 +1,9 @@
 """
 A module that handles all default RESTful API actions for users
 """
+import email
+from tabnanny import check
+from unicodedata import name
 from flask import jsonify, request, make_response, current_app
 from app import db
 from app.models import User
@@ -59,7 +62,6 @@ def login():
 
     if user.check_password(auth.password):
         token = jwt.encode({'name': user.name, 'exp': datetime.datetime.utcnow() + datetime.timedelta(minutes=30)}, current_app.config['SECRET_KEY'])
-        print(token)
         return jsonify({'token': token})
     # return error if password is incorrect
     return make_response(jsonify({"error": "Verification has failed, password is incorrect"}), 401, {'WWW-Authenticate': 'Basic realm="Login required"'})
@@ -71,6 +73,9 @@ def get_users(current_user):
     """
     Retrieves all user account details
     """
+    # handle the off chance that a user trying to consume this API is anonymous
+    if current_user is None:
+        return make_response(jsonify({"error": "action not allowed for this user"}), 403)
     if not current_user.is_admin:
         return make_response(jsonify({"error": "action not allowed for this user"}), 403)
     users = User.query.all()
@@ -100,6 +105,9 @@ def get_user(current_user, id):
     """
     Retrieves a user with a particular id from the database
     """
+    # handle the off chance that a user trying to consume this API is anonymous
+    if current_user is None:
+        return make_response(jsonify({"error": "action not allowed for this user"}), 403)
     if not current_user.is_admin:
         return make_response(jsonify({"error": "action not allowed for this user"}), 403)
     user = User.query.get(id)
@@ -120,6 +128,9 @@ def create_user(current_user):
     """
     Creates a user in the database
     """
+    # handle the off chance that a user trying to consume this API is anonymous
+    if current_user is None:
+        return make_response(jsonify({"error": "action not allowed for this user"}), 403)
     if not current_user.is_admin:
         return make_response(jsonify({"error": "action not allowed for this user"}), 403)
     if request.is_json:
@@ -147,19 +158,26 @@ def create_user(current_user):
 
 
 # route that updates particular info about a user
-@bp.route('/user/<int:id>', methods=['PUT'], strict_slashes=False)
+@bp.route('/user/update', methods=['PUT'], strict_slashes=False)
 @check_for_token
-def update_user(current_user, id):
+def update_user(current_user):
+    """
+    Updates a user's information in the database
+    """
+    # handle the off chance that a user trying to consume this API is anonymous
+    if current_user is None:
+        return make_response(jsonify({"error": "action not allowed for this user"}), 403)
     if request.is_json:
-        user = User.query.get(id)
-        if user is None:
-            return make_response(jsonify({"error": "User does not exist"}), 404)
-
         ignore = ['id', 'password_hash', 'is_admin']
         data = request.get_json()
+        # Make sure user does not change email or name to an existing email or name
+        check_email = User.query.filter_by(email=request.json['email']).first()
+        check_user = User.query.filter_by(name=request.json['name']).first()
+        if check_email or check_user:
+            return make_response(jsonify({"error": "An account with that username or email already exists"}), 400)
         for key, value in data.items():
             if key not in ignore:
-                setattr(user, key, value)
+                setattr(current_user, key, value)
         db.session.commit()
         return make_response(jsonify({"Success": "User account succesfully updated"}), 200)
     else:
@@ -173,6 +191,9 @@ def delete_user(current_user, id):
     """
     Deletes a user from the database
     """
+    # handle the off chance that a user trying to consume this API is anonymous
+    if current_user is None:
+        return make_response(jsonify({"error": "action not allowed for this user"}), 403)
     if not current_user.is_admin:
         return make_response(jsonify({"error": "action not allowed for this user"}), 403)
     user = User.query.get(id)
