@@ -1,93 +1,217 @@
 """
 A module containing the application's test suite
 """
+import os
+from pydoc import synopsis
+from turtle import title
+
+
+# use an in memory db for tests above all imports
+# ensures that variable is correctly set by the time config file is imported
+os.environ['DATABASE_URL'] = 'sqlite://'
+
 import unittest
+from flask import current_app
 from app.models import Book, User
-from app import db
-from main import app
+from app import create_app, db
 
 
-# Unit Tests
-class UserModelCase(unittest.TestCase):
+class BaseTestCase(unittest.TestCase):
     """
-    Unit test for the User model
+    Basetest class that contains the setup and teardown function
     """
     def setUp(self):
         """
         Set up database temporarily
         """
-        app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite://'
+        # create an instance of our app
+        self.app = create_app()
+        # load up everything we need to create the app
+        self.appctx = self.app.app_context()
+        # push context to application_context stack
+        self.appctx.push()
         db.create_all()
+        self.user = self.update_user()
+        self.book = self.update_book()
+        # create client to enable app to mock requests during testing
+        self.client = self.app.test_client
 
     def tearDown(self):
         """
         Destroy temporary database
         """
-        db.session.remove()
         db.drop_all()
+        self.appctx.pop()
+        self.app = None
+        self.appctx = None
+        self.client = None
+
+    def test_app(self):
+        assert self.app is not None
+        assert current_app == self.app
+
+    def update_user(self):
+        """
+        Method adds a user to the db so as to handle routes where log in is required
+        """
+        user = User(name="username", email="username@email.com")
+        user.set_password("password")
+        db.session.add(user)
+        db.session.commit()
+        return user
+
+    def update_book(self):
+        """
+        Method adds a user to the db so as to handle routes where log in is required
+        """
+        book = Book(title="A book", synopsis="A really good read")
+        db.session.add(book)
+        db.session.commit()
+        return book
+
+    def login(self):
+        """
+        Method that performs log in for user
+        """
+        with self.client() as c:
+            c.post('/auth/login', data={
+                "username": "username",
+                "password": "password"
+            })
+
+
+# unit tests for the user model
+class UserModelCase(BaseTestCase):
+    """
+    Unit test for the User model
+    """
+    def test_create_user(self):
+        """
+        Test that creation of user model is successful and goes as planned
+        """
+        user = User(name="user", email="email@email.com")
+        self.assertEqual(user.name, "user")
+        self.assertEqual(user.email, "email@email.com")
+        self.assertNotEqual(user.name, "User")
+        self.assertNotEqual(user.email, "Email@email.com")
 
     def test_password_hashing(self):
         """
         Test password hashing methods
         """
-        u = User(username="String")
+        u = User(name="String", email="string@email.com")
         u.set_password('StringPassword')
         self.assertTrue(u.check_password('StringPassword'))
         self.assertFalse(u.check_password('NotStringPassword'))
 
 
+# unit tests for the book model
+class BookModelCase(BaseTestCase):
+    """
+    Unit test for the book model
+    """
+    def test_create_book(self):
+        """
+        Test that creation of user model is successful and goes as planned
+        """
+        book = Book(
+            synopsis="A very short story",
+            title="Short Story",
+            author="Story A. Teller",
+            year_of_publish=2000
+        )
+        self.assertEqual(book.synopsis, "A very short story")
+        self.assertEqual(book.title, "Short Story")
+        self.assertEqual(book.author, "Story A. Teller")
+        self.assertEqual(book.year_of_publish, 2000)
+
+
 # System Tests
-class AppTestCase(unittest.TestCase):
+class RoutesTestCase(BaseTestCase):
     """
     System test for our core app routes
     """
     def test_index(self):
-        with app.test_client() as c:
-            response = c.get('/')
+        with self.client() as c:
+            # ensure test automatically handles redirects
+            response = c.get('/', follow_redirects=True)
 
-            self.assertEqual(response.status_code, 302)
+            self.assertEqual(response.status_code, 200)
+            # homepage requires users to log in and therefore redirects users to login page
+            # ensure that the response is a redirect to login page
+            self.assertEqual(response.request.path, '/auth/login')
 
-    def test_book_search(self):
-        with app.test_client() as c:
-            response = c.get('/books/s/<name>')
+    def test_add_book(self):
+        self.login()
+        with self.client() as c:
+            response = c.post('/admin/add-book', follow_redirects=True)
 
             self.assertEqual(response.status_code, 200)
 
-    def test_add_book(self):
-        with app.test_client() as c:
-            response = c.get('/add-book/<id>')
-
-            self.assertEqual(response.status_code, 302)
-
     def test_update_book(self):
-        with app.test_client() as c:
-            response = c.get('/update/<id>')
+        self.login()
+        with self.client() as c:
+            response = c.get('/admin/update/<id>', follow_redirects=True)
 
-            self.assertEqual(response.status_code, 302)
+            self.assertEqual(response.status_code, 200)
 
     def test_delete_book(self):
-        with app.test_client() as c:
-            response = c.get('/delete-book/<id>')
+        self.login()
+        with self.client() as c:
+            response = c.get('/admin/delete-book/<id>', follow_redirects=True)
 
-            self.assertEqual(response.status_code, 302)
+            self.assertEqual(response.status_code, 200)
 
-    def test_login(self):
-        with app.test_client() as c:
-            response = c.get('/login')
+    def test_auth_components(self):
+        """
+        Tests the register user and log in user routes
+        """
+        # test register user component
+        with self.client() as c:
+            response = c.post('/auth/register', data={
+                'username': 'Testuser',
+                'email': 'testuser@email.com',
+                'password': 'password',
+                'password2': 'password'
+            }, follow_redirects=True)
+            self.assertEqual(response.status_code, 200)
 
-            self.assertEqual(response.status_code, 302)
-
-    def test_register(self):
-        with app.test_client() as c:
-            response = c.get('/logout')
-
-            self.assertEqual(response.status_code, 302)
+        # test log in component
+        with self.client() as c:
+            response = c.post('/auth/login', data={
+                'username': 'Testuser',
+                'password': 'password'
+            }, follow_redirects=True)
+            self.assertEqual(response.status_code, 200)
 
     def test_logout(self):
-        with app.test_client() as c:
-            response = c.get('/register')
+        self.login()
+        with self.client() as c:
+            response = c.get('/auth/logout', follow_redirects=True)
+
+            self.assertEqual(response.status_code, 200)
+            self.assertEqual(response.request.path, '/auth/login')
+
+    def test_show_book(self):
+        self.login()
+        with self.client() as c:
+            response = c.get('/books/show-book/<id>', follow_redirects=True)
+
+            self.assertEqual(response.status_code, 200)
+
+    def test_borrow_book(self):
+        self.login()
+        with self.client() as c:
+            response = c.get('/books/borrow/<id>', follow_redirects=True)
 
             self.assertEqual(response.status_code, 302)
+
+    def test_return_book(self):
+        self.login()
+        with self.client() as c:
+            response = c.get('/books/return/<id>', data={'id': self.book.id}, follow_redirects=True)
+
+            self.assertEqual(response.status_code, 200)
 
 
 # API tests
@@ -95,4 +219,3 @@ class AppTestCase(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
-    
