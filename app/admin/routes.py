@@ -8,7 +8,7 @@ from app import db
 from PIL import Image
 from app.models import Book, User
 from flask import current_app, flash, redirect, render_template, request, url_for, abort
-from flask_login import current_user
+from flask_login import current_user, login_required
 from app.admin import bp
 from werkzeug.exceptions import RequestEntityTooLarge
 from app.admin.forms import AddBookForm, UpdateBookForm
@@ -23,6 +23,7 @@ def check_admin():
 
 
 @bp.route('/admin')
+@login_required
 def admin():
     """
     The route that renders the admin dashboard
@@ -30,16 +31,6 @@ def admin():
     check_admin()
     books = Book.query.all()
     return render_template('admin/index.html', title="Admin", books=books)
-
-
-@bp.route('/users')
-def users():
-    """
-    route that retrieves all the users from the database
-    """
-    check_admin()
-    users = User.query.all()
-    return render_template('admin/users.html', title="Users", users=users)
 
 
 def save_image(image_file):
@@ -60,6 +51,7 @@ def save_image(image_file):
 
 
 @bp.route('/add-book', methods=['GET', 'POST'])
+@login_required
 def add_book():
     """
     A route that adds a book to the database
@@ -86,6 +78,7 @@ def add_book():
 
 
 @bp.route('/update/<id>', methods=['GET', 'POST'])
+@login_required
 def update_book(id):
     """
     A route that updates the properties of a particular book in the database
@@ -119,6 +112,7 @@ def delete_image(image_file):
 
 
 @bp.route('/delete-book/<id>', methods=['GET', 'DELETE'])
+@login_required
 def delete_book(id):
     """
     A route that handles deleting a book from the database
