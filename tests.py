@@ -31,8 +31,8 @@ class BaseTestCase(unittest.TestCase):
         # push context to application_context stack
         self.appctx.push()
         db.create_all()
-        self.user = self.update_user()
-        self.book = self.update_book()
+        self.update_user()
+        self.update_book()
         # create client to enable app to mock requests during testing
         self.client = self.app.test_client
 
@@ -58,7 +58,6 @@ class BaseTestCase(unittest.TestCase):
         user.set_password("password")
         db.session.add(user)
         db.session.commit()
-        return user
 
     def update_book(self):
         """
@@ -67,7 +66,6 @@ class BaseTestCase(unittest.TestCase):
         book = Book(title="A book", synopsis="A really good read")
         db.session.add(book)
         db.session.commit()
-        return book
 
     def login(self):
         """
@@ -79,7 +77,7 @@ class BaseTestCase(unittest.TestCase):
                 "password": "password"
             })
 
-
+    
 # unit tests for the user model
 class UserModelCase(BaseTestCase):
     """
@@ -191,30 +189,6 @@ class RoutesTestCase(BaseTestCase):
 
             self.assertEqual(response.status_code, 200)
             self.assertEqual(response.request.path, '/auth/login')
-
-    def test_show_book(self):
-        self.login()
-        with self.client() as c:
-            response = c.get('/books/show-book/<id>', follow_redirects=True)
-
-            self.assertEqual(response.status_code, 200)
-
-    def test_borrow_book(self):
-        self.login()
-        with self.client() as c:
-            response = c.get('/books/borrow/<id>', follow_redirects=True)
-
-            self.assertEqual(response.status_code, 302)
-
-    def test_return_book(self):
-        self.login()
-        with self.client() as c:
-            response = c.get('/books/return/<id>', data={'id': self.book.id}, follow_redirects=True)
-
-            self.assertEqual(response.status_code, 200)
-
-
-# API tests
 
 
 if __name__ == "__main__":
