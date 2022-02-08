@@ -21,6 +21,21 @@
           {% endif %}
         </div>
         <div class="row mb-4">
+          {{ form.author.label(class="col-sm-3 col-form-label") }}
+          {% if form.author.errors %}
+            {{ form.author(class="form-control is-invalid") }}
+              <div class="invalid-feedback">
+                {% for error in form.author.errors %}
+                  <span style="color: red;">{{ error }}</span>
+                {% endfor %}
+              </div>
+          {% else %}
+            <div class="col-sm-8">
+              {{ form.author(class="form-control") }}
+            </div>
+          {% endif %}
+        </div>
+        <div class="row mb-4">
           {{ form.synopsis.label(class="col-sm-3 col-form-label")}}
           {% if form.synopsis.errors %}
             {{ form.synopsis(class="form-control is-invalid") }}
@@ -31,7 +46,22 @@
               </div>
           {% else %}
               <div class="col-sm-8">
-                {{ form.synopsis(class="form-control") }}
+                  {{ form.synopsis(class="form-control") }}
+              </div>
+          {% endif %}
+        </div>
+        <div class="row mb-4">
+          {{ form.year_of_publish.label(class="col-sm-3 col-form-label") }}
+          {% if form.year_of_publish.errors %}
+            {{ form.year_of_publish(class="form-control is-invalid") }}
+              <div class="invalid-feedback">
+                {% for error in form.year_of_publish.errors %}
+                  <span style="color: red;">{{ error }}</span>
+                {% endfor %}
+              </div>
+          {% else %}
+              <div class="col-sm-8">
+                {{ form.year_of_publish(class="form-control") }}
               </div>
           {% endif %}
         </div>
