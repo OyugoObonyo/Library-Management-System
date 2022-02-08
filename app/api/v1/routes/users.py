@@ -1,9 +1,6 @@
 """
 A module that handles all default RESTful API actions for users
 """
-import email
-from tabnanny import check
-from unicodedata import name
 from flask import jsonify, request, make_response, current_app
 from app import db
 from app.models import User
@@ -43,10 +40,10 @@ def check_for_token(func):
     return wrapped
 
 
-@bp.route('/login', strict_slashes=False)
-def login():
+@bp.route('/token', strict_slashes=False)
+def token():
     """
-    login route that enables users to get jwt tokens unique to each user
+    route that enables users to get jwt tokens unique to each user
     """
     # get authorization data
     auth = request.authorization
@@ -58,7 +55,7 @@ def login():
     user = User.query.filter_by(name=auth.username).first()
     # return error if user does not exist
     if not user:
-        return make_response(jsonify({"error": "Verification has failed"}), 401, {'WWW-Authenticate': 'Basic realm="Login required"'})
+        return make_response(jsonify({"error": "User doesn't exist, please register first"}), 401, {'WWW-Authenticate': 'Basic realm="Login required"'})
 
     if user.check_password(auth.password):
         token = jwt.encode({'name': user.name, 'exp': datetime.datetime.utcnow() + datetime.timedelta(minutes=30)}, current_app.config['SECRET_KEY'])
