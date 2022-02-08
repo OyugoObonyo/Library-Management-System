@@ -8,20 +8,6 @@ from app.models import Book, user_book, User
 from app.books import bp
 
 
-@bp.route('/books/s/<name>')
-def get_book(name):
-    """
-    A route that displays a particular book with a particular id
-    the route renders a book page in case it's successful
-    """
-    book = Book.query.filter_by(title=name)
-    # Return flash message and redirect to requesting page if name isn't found
-    if book is None:
-        flash("Sorry, book is unavailable at the moment")
-        return redirect(request.referrer)
-    return render_template('books/book.html', book=book)
-
-
 @bp.route('/show-book/<id>')
 def show_book(id):
     """
