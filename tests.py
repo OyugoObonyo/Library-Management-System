@@ -2,9 +2,6 @@
 A module containing the application's test suite
 """
 import os
-from pydoc import synopsis
-from turtle import title
-
 
 # use an in memory db for tests above all imports
 # ensures that variable is correctly set by the time config file is imported
