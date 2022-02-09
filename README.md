@@ -1,8 +1,13 @@
 # Library-Management-System
 
 ## Introduction
+This is a Library Management System (LMS) that mocks a real-life library and has features such as borrowing a book, adding book to library, removing book from library etc. 
 
-## Key Concepts 
+## Key Concepts Learnt 
+* Assigning distinct roles to users i.e admin and non-admin users
+* Mocking tests
+* Integrating CKEditor to application
+* Creating a RESTful API
 
 ## API Documentation
 ### Use cases
@@ -73,8 +78,17 @@ Note that some endpoints are only restricted to admin users and will throw an er
 ### Endpoints that require data in their request bodies
 Some endpoints require data to be passed in their bodies so as to execute user demands.
 
-'''
+'import requests
 
+url = "https://bruno-lms.herokuapp.com/"
+details ={
+    "name": "username",
+    "email": "user@email.com",
+    "password": "!uSer@pa55w0rd"
+}
+
+response = requests.post(f"{url}api/user", json=details)
+print(response.json())
 '''
 
 
