@@ -78,7 +78,7 @@ def user_books(current_user):
     books = current_user.borrowed_books
     books_count = len(books)
     if books_count == 0:
-        return jsonify({"message":"You haven't borrowed any book yet"})
+        return jsonify({"message": "You haven't borrowed any book yet"})
     books_list = []
     for book in books:
         book_data = {
