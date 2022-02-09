@@ -26,7 +26,7 @@ A summary of the available actions for the API is as follows:
 | Get details of all library users | GET | /users | None | Yes | Yes |
 | Get number of all library users | GET | /users/count | None | Yes | Yes |
 | Get details of paticular user | GET | /user/{id} | {id} | Yes | Yes |
-| Create a user account | POST | /users | {name}, {email}, {password} | No | No |
+| Create a user account | POST | /users | None | No | No |
 | Update user's details | PUT | /user/update | None | Yes | No |
 | Delete user account| DELETE | /user/{id} | {id} | Yes | Yes |
 
