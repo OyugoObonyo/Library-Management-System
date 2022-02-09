@@ -125,7 +125,7 @@ def get_user(current_user, id):
 
 # create api route that creates a user account
 @bp.route('/user', methods=['POST'], strict_slashes=False)
-def create_user(current_user):
+def create_user():
     """
     Creates a user in the database
     """
