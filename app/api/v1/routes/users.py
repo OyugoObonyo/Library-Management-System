@@ -88,10 +88,15 @@ def get_users(current_user):
 
 
 @bp.route('/users/count', methods=['GET'], strict_slashes=False)
-def number_users():
+@check_for_token
+def number_users(current_user):
     """
     Returns the total number of users in the database
     """
+    if current_user is None:
+        return make_response(jsonify({"error": "action not allowed for this user"}), 403)
+    if not current_user.is_admin:
+        return make_response(jsonify({"error": "action not allowed for this user"}), 403)
     users_count = User.query.count()
     return jsonify({"Total number of books": users_count})
 
@@ -120,16 +125,10 @@ def get_user(current_user, id):
 
 # create api route that creates a user account
 @bp.route('/user', methods=['POST'], strict_slashes=False)
-@check_for_token
 def create_user(current_user):
     """
     Creates a user in the database
     """
-    # handle the off chance that a user trying to consume this API is anonymous
-    if current_user is None:
-        return make_response(jsonify({"error": "action not allowed for this user"}), 403)
-    if not current_user.is_admin:
-        return make_response(jsonify({"error": "action not allowed for this user"}), 403)
     if request.is_json:
         if 'name' not in request.get_json():
             return make_response(jsonify({"error": "name is missing"}), 400)
