@@ -13,7 +13,7 @@ A summary of the available actions for the API is as follows:
 | --- | --- | --- | --- | --- | --- |
 | Get details of all books in the library | GET | /books | None | No | No |
 | Get number of books in the library | GET | /books/count | None | No | No |
-| Get all books by a particular author | GET | /books/{author} | {author} | No | No |
+| Get all books by a particular author | GET | /books/author | None | No | No |
 | Get list of book(s) borrowed by current user | GET | /books/mine | None | Yes | No |
 | Get book with particular title | GET | /books/{title} | {title} | No | No |
 | Update a book's details | PUT | /books/update/{title} | {title} | Yes | Yes |
@@ -21,10 +21,61 @@ A summary of the available actions for the API is as follows:
 | Get details of all library users | GET | /users | None | Yes | Yes |
 | Get number of all library users | GET | /users/count | None | Yes | Yes |
 | Get details of paticular user | GET | /user/{id} | {id} | Yes | Yes |
-| Add a user | POST | /users | {name}, {email}, {password} | No | No |
+| Create a user account | POST | /users | {name}, {email}, {password} | No | No |
 | Update user's details | PUT | /user/update | None | Yes | No |
 | Delete user account| DELETE | /user/{id} | {id} | Yes | Yes |
 
+### Getting a token
+Some endpoints, as noted in the table above, require that users are authenticated and have a token. A user (has to be a registered user) can obtain a token as follows:
+
+'''
+import requests
+
+url = "https://bruno-lms.herokuapp.com/"
+
+username = "<your username>"
+password = "<your password>"
+
+token = requests.get(f"{url}api/token", auth=(username, password))
+print(token.json())
+'''
+
+### API in action
+#### Endpoints that don't require token authentication
+Some API endpoints don't require token authentication. An example of such an endpoint is the '/books/count' endpoint which returns the total number of books in the library and can be accessed as follows: 
+
+'''
+import requests
+
+url = "https://bruno-lms.herokuapp.com/"
+
+response = requests.get(f"{url}api/books/count")
+print(response.json())
+'''
+
+### Endpoints that require token authentication
+Users have to possess a valid token so as to access certain endpoints. In order for such endpoints to return the desired output, users have to pass in their token to the headers.
+
+'''
+import requests
+
+url = "https://bruno-lms.herokuapp.com/"
+token = {
+    'x-access-token': '<yourRAndoMLYgenerateddTokenGoeshere>'
+}
+
+response = requests.get(f"{url}api/books/mine", headers=token)
+print(response.json())
+'''
+
+Note that some endpoints are only restricted to admin users and will throw an error if a non-admin user tries to access it.
+
+### Endpoints that require data in their request bodies
+Some endpoints require data to be passed in their bodies so as to execute user demands.
+
+'''
+
+'''
 
 
 Live version of the app can be found at https://bruno-lms.herokuapp.com/
