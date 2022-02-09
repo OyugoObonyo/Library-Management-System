@@ -33,7 +33,7 @@ A summary of the available actions for the API is as follows:
 ### Getting a token
 Some endpoints, as noted in the table above, require that users are authenticated and have a token. A user (has to be a registered user) can obtain a token as follows:
 
-'''
+```
 import requests
 
 url = "https://bruno-lms.herokuapp.com/"
@@ -43,25 +43,25 @@ password = "<your password>"
 
 token = requests.get(f"{url}api/token", auth=(username, password))
 print(token.json())
-'''
+```
 
 ### API in action
 #### Endpoints that don't require token authentication
 Some API endpoints don't require token authentication. An example of such an endpoint is the '/books/count' endpoint which returns the total number of books in the library and can be accessed as follows: 
 
-'''
+```
 import requests
 
 url = "https://bruno-lms.herokuapp.com/"
 
 response = requests.get(f"{url}api/books/count")
 print(response.json())
-'''
+```
 
 ### Endpoints that require token authentication
 Users have to possess a valid token so as to access certain endpoints. In order for such endpoints to return the desired output, users have to pass in their token to the headers.
 
-'''
+```
 import requests
 
 url = "https://bruno-lms.herokuapp.com/"
@@ -71,14 +71,15 @@ token = {
 
 response = requests.get(f"{url}api/books/mine", headers=token)
 print(response.json())
-'''
+```
 
 Note that some endpoints are only restricted to admin users and will throw an error if a non-admin user tries to access it.
 
 ### Endpoints that require data in their request bodies
 Some endpoints require data to be passed in their bodies so as to execute user demands.
 
-'import requests
+```
+import requests
 
 url = "https://bruno-lms.herokuapp.com/"
 details ={
@@ -89,7 +90,6 @@ details ={
 
 response = requests.post(f"{url}api/user", json=details)
 print(response.json())
-'''
-
+```
 
 Live version of the app can be found at https://bruno-lms.herokuapp.com/
